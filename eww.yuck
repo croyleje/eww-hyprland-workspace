@@ -1,0 +1,25 @@
+; This should be look familiar to you if you've read Hyprland docs (Hyplrand
+; Eww)[https://wiki.hyprland.org/hyprland-wiki/pages/Useful-Utilities/Status-Bars/#eww]
+; I intentially rewrote to use the default supplied in the Hyprland docs to
+; hopefully make it easier to understand.
+
+; Along with this repo there is also copies of the default scripts slightly modified
+; to work with my new script.
+
+(deflisten workspaces :initial "[]" "bash ~/.config/eww/scripts/get-workspaces")
+(deflisten current_workspace :initial "..." "bash ~/.config/eww/scripts/get-active-workspace")
+(deflisten urgent_workspace :initial "..." "bash ~/.config/eww/scripts/get-urgent-workspaces")
+(defwidget _workspaces []
+  (eventbox :onscroll "bash ~/.config/eww/scripts/change-active-workspace {} ${current_workspace}" :class "workspaces-widget"
+    (box :space-evenly false
+      (label :text "${workspaces}${current_workspace}${urgent_workspace}" :visible false)
+      (for workspace in workspaces
+        (eventbox :onclick "hyprctl dispatch workspace ${workspace.id}"
+          (box :class "workspace-entry ${workspace.id == current_workspace ? "current" : ""} ${workspace.id == urgent_workspace ? "urgent" : ""} ${workspace.windows > 0 ? "occupied" : "empty" }"
+            (label :text "${workspace.id}")
+          )
+        )
+      )
+    )
+  )
+)
